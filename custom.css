@@ -6,6 +6,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+  box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.5);
 }
 
 td, th {
@@ -39,6 +40,9 @@ tr:nth-child(even) {
   }
   .nm_container {
     padding: 0px;
+  }
+  table {
+    box-shadow: none;
   }
 }
 
