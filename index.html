@@ -13,19 +13,40 @@
 </head>
 
 <body>
+  <nav>
+    <ul>
+      <li class="on" tab="Rating"><a>Rating</a></li>
+      <li tab="Matches"><a>Matches</a></li>
+    </ul>
+  </nav>
   <div class="nm_container">
     <div class="center">
       <h1>SpikeELO/<a contenteditable="true" id="q" spellcheck="false">*</a></h1>
     </div>
-    <table>
-      <tr>
-        <th>Team</th>
-        <th>ELO</th>
-      </tr>
-      <tbody id="table">
+    <div class="tab_container">
+      <div tab="rating">
+        <table>
+          <tr>
+            <th>Team</th>
+            <th>ELO</th>
+          </tr>
+          <tbody id="ratingElem">
 
-      </tbody>
-    </table>
+          </tbody>
+        </table>
+      </div>
+      <div tab="matches" style="display: none;">
+        <table>
+          <tr>
+            <th>Winner</th>
+            <th>Loser</th>
+          </tr>
+          <tbody id="matchesElem">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
   </div>
 </body>
 
