@@ -58,6 +58,14 @@ tr:nth-child(even) {
   text-align: left;
 }
 
-.on a{
+.on a {
   color: var(--accent) !important;
+}
+
+.green {
+  color: hsl(145, 66%, 70%);
+}
+
+.red {
+  color: hsl(-15, 66%, 70%);
 }

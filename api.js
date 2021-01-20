@@ -21,7 +21,6 @@ const State = {
   set q(val) {
     this._q = val
     if (qElem.innerText.toLowerCase() != val.toLowerCase()) qElem.innerText = val
-    window.location.hash = val.toLowerCase()
     filterTeams()
   },
   _tab: "Rating",
@@ -42,10 +41,12 @@ const State = {
       matchesElem.innerHTML = ""
       for (let i = 0; i < State.shownMatches.length; i++) {
         let m = State.shownMatches[i]
-        matchesElem.innerHTML += `<tr>
-          <td>${formatID(m[0])} (${m[2]}+${m[4]})</td>
-          <td>${formatID(m[1])} (${m[3]}-${m[4]})</td>
-        </tr>`
+        let c1 = `<td>${formatID(m[0])} (${m[2]}<span class="green"> +${m[4]}</span>)</td>`
+        let c2 = `<td>${formatID(m[1])} (${m[3]}<span class="red"> -${m[4]}</span>)</td>`
+        if (State.q != "*" && State.q != '' && !makeQuery(State.q).test(plainTextID(m[0])) && makeQuery(State.q).test(plainTextID(m[1]))) {
+          [c1, c2] = [c2, c1]
+        }
+        matchesElem.innerHTML += `<tr>${c1}${c2}</tr>`
       }
     }
   },
@@ -67,6 +68,24 @@ function formatID(id) {
   return `<a href=#${p1}>${p1}</a> & <a href=#${p2}>${p2}</a>`
 }
 
+function makeQuery(q) {
+  let query;
+  if (q == "*") {
+    query = {
+      test() {
+        return true;
+      }
+    }
+  } else {
+    query = new RegExp(`${State.q}`, "i")
+  }
+  return query
+}
+
+function plainTextID(id) {
+  return `${formatName(id[0])} & ${formatName(id[1])}`
+}
+
 function updateElo(w, l) {
   let k = 32//magic chess number
 
@@ -80,16 +99,7 @@ function updateElo(w, l) {
 }
 
 function filterTeams() {
-  let query;
-  if (State.q == "*") {
-    query = {
-      test() {
-        return true;
-      }
-    }
-  } else {
-    query = new RegExp(`${State.q}`, "i")
-  }
+  let query = makeQuery(State.q)
   let count = 0;
   for (let i = 0; i < ratingElem.children.length; i++) {
     let row = ratingElem.children[i]
@@ -103,8 +113,8 @@ function filterTeams() {
   }
   let newShownMatches = []
   for (let i = Matches.length - 1; i >= 0; i--) {
-    let team1 = formatName(Matches[i][0][0]) + " & " + formatName(Matches[i][0][1])
-    let team2 = formatName(Matches[i][1][0]) + " & " + formatName(Matches[i][1][1])
+    let team1 = plainTextID(Matches[i][0])
+    let team2 = plainTextID(Matches[i][1])
     if (query.test(team1) || query.test(team2)) {
       newShownMatches.push(Matches[i])
     }
@@ -172,6 +182,7 @@ window.onload = () => {
     if (e.key == "Enter") {
       e.preventDefault()
       qElem.blur()
+      window.location.hash = State.q.toLowerCase()
     }
   })
   qElem.addEventListener("blur", () => {
