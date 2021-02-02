@@ -1,7 +1,11 @@
 const url = "https://docs.google.com/spreadsheets/d/1wEtNxQyLzdBLiHQIDc0YDATR9Zc7y8FZ4gy3v-MrSqE/export?format=csv"
-const matchCount = 10;
+const matchCount = 20;
 
 let ELO = {
+
+}
+
+let Games = {
 
 }
 
@@ -13,6 +17,7 @@ let names = {
   I: "August",
   N: "Neel",
   S: "Simon",
+  G: "Guarov"
 }
 
 const State = {
@@ -86,8 +91,14 @@ function plainTextID(id) {
   return `${formatName(id[0])} & ${formatName(id[1])}`
 }
 
+function calcK(team) {
+  if (Games[team]) return 32 + 64 / Games[team]//dumb function
+  return 32 * 3
+}
+
 function updateElo(w, l) {
-  let k = 32//magic chess number
+  let k = Math.min(calcK(w), calcK(l))//magic chess number
+  console.log(k)
 
   let rw = 10 ** (ELO[w] / 400)
   let rl = 10 ** (ELO[l] / 400)
@@ -95,6 +106,8 @@ function updateElo(w, l) {
   let Δ = Math.round(ELO[w] + k * (1 - ew) - ELO[w])
   ELO[w] += Δ
   ELO[l] -= Δ
+  Games[w] = Games[w] ? Games[w] + 1 : 1
+  Games[l] = Games[l] ? Games[l] + 1 : 1
   return Δ
 }
 
