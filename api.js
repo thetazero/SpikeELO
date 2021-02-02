@@ -60,6 +60,14 @@ const State = {
   set shownMatches(val) {
     this._shownMatches = val
     if (this.tab == "Matches") this.tabFn[this.tab]()
+  },
+  _avg: 1000,
+  get avg() {
+    return _avg
+  },
+  set avg(val) {
+    this._avg = val
+    document.querySelector("#averageELO").innerText = isNaN(val) ? "????" : Math.round(val)
   }
 }
 
@@ -114,16 +122,20 @@ function updateElo(w, l) {
 function filterTeams() {
   let query = makeQuery(State.q)
   let count = 0;
+  let avg = 0
   for (let i = 0; i < ratingElem.children.length; i++) {
     let row = ratingElem.children[i]
     let name = ratingElem.children[i].children[0].innerText
     let match = query.test(name)
     row.style.display = match ? "" : "none"
     if (match) {
+      avg += parseInt(ratingElem.children[i].children[1].innerText)
       row.style.background = count % 2 == 0 ? "var(--background)" : "var(--background_darker)"
       count++
     }
   }
+  avg /= count
+  State.avg = avg
   let newShownMatches = []
   for (let i = Matches.length - 1; i >= 0; i--) {
     let team1 = plainTextID(Matches[i][0])
