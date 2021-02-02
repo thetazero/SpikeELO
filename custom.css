@@ -18,6 +18,11 @@ td a {
   text-decoration: none;
 }
 
+td a:hover {
+  color: var(--text_darken) !important;
+  text-decoration: underline;
+}
+
 th {
   background: var(--background_emphasize);
   color: #fff;
