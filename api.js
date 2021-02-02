@@ -20,6 +20,10 @@ let names = {
   G: "Guarov"
 }
 
+let getID = {
+
+}
+
 const State = {
   _q: "*",
   get q() { return this._q },
@@ -27,6 +31,11 @@ const State = {
     this._q = val
     if (qElem.innerText.toLowerCase() != val.toLowerCase()) qElem.innerText = val
     filterTeams()
+    this._qWatch.forEach(e => { e(val) })
+  },
+  _qWatch: [],
+  qWatch(fn) {
+    this._qWatch.push(fn)
   },
   _tab: "Rating",
   get tab() { return this._tab },
@@ -34,7 +43,11 @@ const State = {
     this._tab = val
     Array.from(navElem.children).forEach(e => {
       console.log(e)
-      e.classList = e.getAttribute("tab").toLowerCase() == val.toLowerCase() ? "on" : ""
+      if (e.getAttribute("tab").toLowerCase() == val.toLowerCase()) {
+        e.classList.add("on")
+      } else {
+        e.classList.remove("on")
+      }
     })
     Array.from(containerElem.children).forEach(e => {
       e.style.display = e.getAttribute("tab").toLowerCase() == val.toLowerCase() ? "block" : "none"
@@ -53,6 +66,10 @@ const State = {
         }
         matchesElem.innerHTML += `<tr>${c1}${c2}</tr>`
       }
+    },
+    Team() {
+      State.teamSelected = getID[State.q.toLowerCase()] ?? null
+      console.log(getID[State.q])
     }
   },
   _shownMatches: [],
@@ -68,8 +85,36 @@ const State = {
   set avg(val) {
     this._avg = val
     document.querySelector("#averageELO").innerText = isNaN(val) ? "????" : Math.round(val)
+  },
+  _teamSelected: false,
+  get teamSelected() {
+    return this._teamSelected
+  },
+  set teamSelected(id) {
+    this._teamSelected = id
+    document.querySelector("#teamSelected").style.display = id ? "none" : "block"
+    let e = document.querySelector("#teamCard")
+    e.style.display = id ? "block" : "none"
+    if (id != null) {
+      let [wins, losses] = [0, 0]
+      Matches.forEach(([winner, looser]) => {
+        if (winner == id) {
+          wins++
+        } else if (looser == id) {
+          losses++
+        }
+      })
+      e.querySelector('.title').innerText = `${plainTextID(id)} (${ELO[id]})`
+      e.querySelector('.games').innerHTML = `${Games[id]}`
+      e.querySelector('.wins').innerHTML = `${wins}`
+      e.querySelector('.losses').innerHTML = `${losses}`
+    }
   }
 }
+
+State.qWatch((q) => {
+  State.teamSelected = getID[State.q.toLowerCase()] ?? null
+})
 
 function formatName(n) {
   return names[n] ?? n
@@ -78,7 +123,7 @@ function formatName(n) {
 function formatID(id) {
   let p1 = formatName(id[0])
   let p2 = formatName(id[1])
-  return `<a href=#${p1}>${p1}</a> & <a href=#${p2}>${p2}</a>`
+  return `<a href=#${p1}>${p1}</a> <a href="#${p1} & ${p2}">&</a> <a href=#${p2}>${p2}</a>`
 }
 
 function makeQuery(q) {
@@ -96,7 +141,9 @@ function makeQuery(q) {
 }
 
 function plainTextID(id) {
-  return `${formatName(id[0])} & ${formatName(id[1])}`
+  let text = `${formatName(id[0])} & ${formatName(id[1])}`
+  getID[text.toLowerCase()] = id
+  return text
 }
 
 function calcK(team) {
@@ -215,9 +262,12 @@ window.onload = () => {
     State.q = qElem.innerText
   })
   Array.from(navElem.children).forEach(e => {
-    e.addEventListener('click', () => {
-      State.tab = e.getAttribute('tab')
-    })
+    if (e.getAttribute("tab") != "None") {
+      console.log(e.innerText, e.getAttribute("tab"))
+      e.addEventListener('click', () => {
+        State.tab = e.getAttribute('tab')
+      })
+    }
   })
 
   State.q = decodeURI(window.location.hash.slice(1))
@@ -226,4 +276,9 @@ window.onload = () => {
 
 window.onhashchange = () => {
   State.q = decodeURI(window.location.hash.slice(1))
+}
+
+function clearQuery() {
+  State.q = "*"
+  window.location.hash = State.q.toLowerCase()
 }

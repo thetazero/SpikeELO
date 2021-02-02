@@ -17,6 +17,8 @@
     <ul>
       <li class="on" tab="Rating"><a>Rating</a></li>
       <li tab="Matches"><a>Matches</a></li>
+      <li tab="Team"><a>Team</a></li>
+      <li tab="None" class="x" ><a onclick="clearQuery()">X</a></li>
     </ul>
   </nav>
   <div class="nm_container">
@@ -44,6 +46,15 @@
           <tbody id="matchesElem">
           </tbody>
         </table>
+      </div>
+      <div tab="Team" style="display: none;">
+        <b id="teamSelected">Please select a team</b>
+        <div id="teamCard">
+          <h1 class="title"></h1>
+          Games: <b class="games">0</b>
+          Wins: <b class="green wins">0</b>
+          Losses: <b class="red losses">0</b>
+        </div>
       </div>
     </div>
   </div>
