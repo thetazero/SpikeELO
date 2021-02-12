@@ -152,7 +152,8 @@ function calcK(team) {
 }
 
 function updateElo(w, l) {
-  let k = Math.min(calcK(w), calcK(l))//magic chess number
+  // let k = Math.min(calcK(w), calcK(l))//magic chess number
+  let k = 48
   console.log(k)
 
   let rw = 10 ** (ELO[w] / 400)
